@@ -1,5 +1,7 @@
 // Configuration
-const API_BASE_URL = 'http://localhost:8000'; // Change in production
+// For local dev: http://localhost:8000
+// For production: update to your Railway URL below
+const API_BASE_URL = 'https://rewriteapp-production.up.railway.app';
 
 // Get DOM elements
 const inputText = document.getElementById('inputText');

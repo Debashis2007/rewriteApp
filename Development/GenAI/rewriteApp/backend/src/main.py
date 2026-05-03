@@ -1,7 +1,11 @@
 """FastAPI application for text rewriting."""
 
+import os
+from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional
 import logging
@@ -155,4 +159,15 @@ async def get_actions():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+
+
+# Serve React frontend (must be last — after all API routes)
+FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa(full_path: str):
+        index = FRONTEND_DIST / "index.html"
+        return FileResponse(str(index))
